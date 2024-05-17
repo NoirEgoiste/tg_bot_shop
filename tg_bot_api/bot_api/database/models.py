@@ -10,5 +10,47 @@ async_session = async_sessionmaker(engine)
 
 
 class Base(AsyncAttrs, DeclarativeBase):
-    pass
+    id: Mapped[int] = mapped_column(primary_key=True)
 
+
+class User(Base):
+    __tablename__ = 'users'
+    
+    tg_id = mapped_column(BigInteger)
+    cart_relationship: Mapped[list['Cart']] = relationship(back_populates='user_relationship')
+
+
+class Category(Base):
+    __tablename__ = 'categories'
+    name: Mapped[int] = mapped_column(String(80))
+
+    item_relationship: Mapped[list['Item']] = relationship(back_populates='category_relationship')
+
+
+class Item(Base):
+    __tablename__ = 'items'
+    
+    name: Mapped[str] = mapped_column(String(50))
+    description: Mapped[str] = mapped_column(String(200))
+    photo: Mapped[str] = mapped_column(String(200))
+    price: Mapped[int] = mapped_column()
+    category: Mapped[int] = mapped_column(ForeignKey('categories.id'))
+    
+    category_relationship: Mapped['Category'] = relationship(back_populates='item_relationship')
+    cart_relationship: Mapped[list['Cart']] = relationship(back_populates='item_relationship')
+
+
+class Cart(Base):
+    __tablename__ = 'cart'
+    
+    user: Mapped[int] = mapped_column(ForeignKey='users.id')
+    item: Mapped[int] = mapped_column(ForeignKey='item.id')
+    
+    user_relationship: Mapped['User'] = relationship(bakc_populates='cart_relationship')
+    item_relationship: Mapped['Item'] = relationship(back_populates='cart_relationship')
+
+
+async def async_main():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata().create_all)
+    
