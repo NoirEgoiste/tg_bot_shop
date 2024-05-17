@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher
 
 from config import TOKEN
 
+
 async def main():
     bot = Bot(token=TOKEN)
     dp = Dispatcher()
@@ -12,4 +13,8 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    logging.basicConfig(level=logging.INFO)
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logging.info('Ctrl+C pressed. Stopping.')
