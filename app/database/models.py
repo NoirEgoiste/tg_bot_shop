@@ -43,14 +43,14 @@ class Item(Base):
 class Cart(Base):
     __tablename__ = 'cart'
     
-    user: Mapped[int] = mapped_column(ForeignKey='users.id')
-    item: Mapped[int] = mapped_column(ForeignKey='item.id')
+    user: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    item: Mapped[int] = mapped_column(ForeignKey('items.id'))
     
-    user_relationship: Mapped['User'] = relationship(bakc_populates='cart_relationship')
+    user_relationship: Mapped['User'] = relationship(back_populates='cart_relationship')
     item_relationship: Mapped['Item'] = relationship(back_populates='cart_relationship')
 
 
 async def async_main():
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata().create_all)
+        await conn.run_sync(Base.metadata.create_all)
     
