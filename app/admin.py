@@ -12,13 +12,12 @@ admin = Router()
 
 class NewsLetter(StatesGroup):
     message = State()
-    # confirm = State()
 
 
 class AddItem(StatesGroup):
     name = State()
-    description = State()
     category = State()
+    description = State()
     photo = State()
     price = State()
 
@@ -61,28 +60,30 @@ async def add_item(message: Message, state: FSMContext):
 @admin.message(AdminProtect(), AddItem.name)
 async def add_item_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
-    await state.set_state(AddItem.description)
-    await message.answer("Enter Item description")
-
-
-@admin.message(AdminProtect(), AddItem.description)
-async def add_item_category(message: Message, state: FSMContext):
-    await state.update_data(description=message.text)
     await state.set_state(AddItem.category)
     await message.answer("Select or Add Item category",
-                         reply_markup=await keyboards.categories())
+                         reply_markup=await keyboards.categories_keyboard())
 
 
 @admin.callback_query(AdminProtect(), AddItem.category)
 async def add_item_category(callback: CallbackQuery, state: FSMContext):
     await state.update_data(category=callback.data.split("_")[1])
+    await state.set_state(AddItem.description)
+    await callback.answer("")
+    await callback.message.answer("Enter Item description")
+
+
+
+@admin.message(AdminProtect(), AddItem.description)
+async def add_item_description(message: Message, state: FSMContext):
+    await state.update_data(description=message.text)
     await state.set_state(AddItem.photo)
-    await callback.message.answer("Enter Item photo")
+    await message.answer("Upload Item photo")
 
 
 @admin.message(AdminProtect(), AddItem.photo, F.photo)
 async def add_item_photo(message: Message, state: FSMContext):
-    await state.update_data(name=message.photo[-1].file_id)
+    await state.update_data(photo=message.photo[-1].file_id)
     await state.set_state(AddItem.price)
     await message.answer("Enter Item price")
 
