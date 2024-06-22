@@ -22,7 +22,7 @@ class User(Base):
 
 class Category(Base):
     __tablename__ = 'categories'
-    name: Mapped[int] = mapped_column(String(80))
+    name: Mapped[str] = mapped_column(String(80))
 
     item_relationship: Mapped[list['Item']] = relationship(back_populates='category_relationship')
 
