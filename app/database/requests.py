@@ -18,6 +18,13 @@ async def set_item(data):
         session.add(Item(**data))
         await session.commit()
 
+
+async def set_new_category(category_name):
+    async with async_session() as session:
+        session.add(Category(name=category_name))
+        await session.commit()
+
+
 async def set_cart(tg_id, item_id):
     async with async_session() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
@@ -31,12 +38,12 @@ async def get_users():
         return users
 
 
-
 async def get_cart(tg_id):
     async with async_session() as session:
         user = await session.scalar(select(User).where(User.tg_id == tg_id))
         cart = await session.scalars(select(Cart).where(Cart.user == user.id))
     return cart
+
 
 async def get_categories():
     async with async_session() as session:
@@ -58,6 +65,7 @@ async def get_items_by_id(item_id):
             select(Item).where(Item.id == item_id)
         )
         return item
+
 
 async def delete_cart(tg_id, item_id):
     async with async_session() as session:
