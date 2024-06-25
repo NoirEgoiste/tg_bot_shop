@@ -15,9 +15,10 @@ class Base(AsyncAttrs, DeclarativeBase):
 
 class User(Base):
     __tablename__ = 'users'
-    
+
+    tg_name: Mapped[str] = mapped_column()
     tg_id = mapped_column(BigInteger)
-    cart_relationship: Mapped[list['Cart']] = relationship(back_populates='user_relationship')
+    cart_relationship: Mapped['Cart'] = relationship(back_populates='user_relationship')
 
 
 class Category(Base):

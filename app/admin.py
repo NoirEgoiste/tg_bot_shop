@@ -57,7 +57,8 @@ async def newsletter_message(message: Message, state: FSMContext):
     await state.clear()
 
 
-# Todo отсутствует возможность добавить новые категории, функция есть но не работает должным образом.
+# Todo отсутствует возможность добавить новые категории, функция есть но не
+#  работает должным образом.
 @admin.message(AdminProtect(), Command("add_category"), AddCategory.name)
 async def add_category(message: Message, state: FSMContext):
     # await state.set_state(AddCategory.name)

@@ -63,8 +63,11 @@ async def cart(callback: CallbackQuery):
 @router.callback_query(F.data == "my_cart")
 async def my_cart(callback: CallbackQuery):
     user_cart = await get_cart(callback.from_user.id)
+    if not user_cart:
+        await callback.message.answer("Your cart is empty")
+
     for c_item in user_cart:
-        item = await get_items_by_id(c_item.id)
+        item = await get_items_by_id(c_item.item)
         await (
             callback.message.answer_photo(
                 photo=item.photo,
@@ -78,6 +81,7 @@ async def my_cart(callback: CallbackQuery):
 @router.callback_query(F.data.startwith("delete_"))
 async def delete_from_cart(callback: CallbackQuery):
     await delete_cart(callback.from_user.id,
-                      int(callback.data.split("_")[1]))
+                      callback.data.split("_")[1])
+    await callback.message.delete()
     await callback.message.answer("Item removed")
 
