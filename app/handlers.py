@@ -12,8 +12,9 @@ router = Router()
 @router.message(CommandStart())
 @router.callback_query(F.data == "to_main")
 async def cmd_start(message: Message | CallbackQuery):
+    print(message.from_user.id, message.from_user.username)
     if isinstance(message, Message):
-        await set_user(message.from_user.id)
+        await set_user(message.from_user.id, message.from_user.username)
         await message.answer("Welcome to internet shop!",
                              reply_markup=keyboards.main_keyboard)
     else:
@@ -53,7 +54,7 @@ async def item(callback: CallbackQuery):
 async def cart(callback: CallbackQuery):
     order_id = await set_cart(
         callback.from_user.id,
-        int(callback.data.split("_")[1]))
+        callback.data.split("_")[1])
 
     await callback.answer(
         "Added to cart",

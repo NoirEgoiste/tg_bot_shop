@@ -38,7 +38,7 @@ async def categories_keyboard():
             text=category.name,
             callback_data=f"category_{category.id}"))
     keyboard.add(InlineKeyboardButton(text="Back",
-                                      callback_data="catalog"))
+                                      callback_data="to_main"))
     return keyboard.adjust(2).as_markup()
 
 
