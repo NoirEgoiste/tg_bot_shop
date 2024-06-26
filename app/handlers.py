@@ -14,40 +14,46 @@ router = Router()
 async def cmd_start(message: Message | CallbackQuery):
     print(message.from_user.id, message.from_user.username)
     if isinstance(message, Message):
-        await set_user(message.from_user.id, message.from_user.username)
-        await message.answer("Welcome to internet shop!",
-                             reply_markup=keyboards.main_keyboard)
+        await set_user(
+            message.from_user.id, message.from_user.username
+        )
+        await message.answer(
+            "Welcome to internet shop!",
+            reply_markup=keyboards.main_keyboard
+        )
     else:
         await message.answer("Back to main menu")
-        await message.message.answer("Welcome to internet shop!",
-                                     reply_markup=keyboards.to_main_keyboard)
+        await message.message.answer(
+            "Welcome to internet shop!",
+            reply_markup=keyboards.to_main_keyboard
+        )
 
 
 @router.callback_query(F.data == "catalog")
 async def catalog(callback: CallbackQuery):
-    await callback.message.edit_text("Choose, category",
-                                     reply_markup=
-                                     await keyboards.categories_keyboard())
+    await callback.message.edit_text(
+        "Choose, category",
+        reply_markup=await keyboards.categories_keyboard()
+    )
 
 
 @router.callback_query(F.data.startswith("category_"))
 async def category(callback: CallbackQuery):
     category_id = int(callback.data.split("_")[1])
-    await callback.message.edit_text("Choose a product",
-                                     reply_markup=
-                                     await keyboards.items_keyboard(
-                                         category_id))
+    await callback.message.edit_text(
+        "Choose a product",
+        reply_markup=await keyboards.items_keyboard(category_id))
 
 
 @router.callback_query(F.data.startswith("item_"))
 async def item(callback: CallbackQuery):
-    item = await get_items_by_id(int(callback.data.split("_")[1]))
+    item_id = await get_items_by_id(int(callback.data.split("_")[1]))
     await callback.message.answer_photo(
-        photo=item.photo,
-        caption=f"Product Name: {item.name}\n\n"
-                f"Description: {item.description}\n"
-                f"Cost: ${item.price}",
-        reply_markup=await keyboards.cart_keyboard(item.id))
+        photo=item_id.photo,
+        caption=f"Product Name: {item_id.name}\n\n"
+                f"Description: {item_id.description}\n"
+                f"Cost: ${item_id.price}",
+        reply_markup=await keyboards.cart_keyboard(item_id.id))
 
 
 @router.callback_query(F.data.startswith("order_"))
@@ -68,15 +74,17 @@ async def my_cart(callback: CallbackQuery):
         await callback.message.answer("Your cart is empty")
 
     for c_item in user_cart:
-        item = await get_items_by_id(c_item.item)
+        items = await get_items_by_id(c_item.item)
         await (
             callback.message.answer_photo(
-                photo=item.photo,
-                caption=f"Product Name: {item.name}\n\n"
-                        f"Description: {item.description}\n"
-                        f"Cost: ${item.price}",
-                reply_markup=
-                await keyboards.delete_from_cart_keyboard(item.id)))
+                photo=items.photo,
+                caption=f"Product Name: {items.name}\n\n"
+                        f"Description: {items.description}\n"
+                        f"Cost: ${items.price}",
+                reply_markup=await keyboards.
+                delete_from_cart_keyboard(items.id)
+            )
+        )
 
 
 @router.callback_query(F.data.startwith("delete_"))
@@ -85,4 +93,3 @@ async def delete_from_cart(callback: CallbackQuery):
                       callback.data.split("_")[1])
     await callback.message.delete()
     await callback.message.answer("Item removed")
-
