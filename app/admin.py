@@ -57,15 +57,18 @@ async def newsletter_message(message: Message, state: FSMContext):
     await state.clear()
 
 
-# Todo отсутствует возможность добавить новые категории, функция есть но не
-#  работает должным образом.
-@admin.message(AdminProtect(), Command("add_category"), AddCategory.name)
+@admin.message(AdminProtect(), Command("add_category"))
 async def add_category(message: Message, state: FSMContext):
-    # await state.set_state(AddCategory.name)
+    await state.set_state(AddCategory.name)
     await message.answer("Enter category to add")
-    # await state.update_data(category=message.text)
-    await set_new_category(message.text)
-    await message.answer("Added successfully")
+
+
+@admin.message(AdminProtect(), AddCategory.name)
+async def add_category_name(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await set_new_category(await state.get_data())
+    await message.answer("Category successfully added")
+    await state.clear()
 
 
 @admin.message(AdminProtect(), Command("add_item"))

@@ -1,7 +1,9 @@
+import sqlalchemy
 from sqlalchemy import select, update, delete
 
 from app.database.models import User, Category, Item, Cart
 from app.database.models import async_session
+from app.errors.database_errors import AlreadyExistsError
 
 
 async def set_user(tg_id, username):
@@ -21,7 +23,10 @@ async def set_item(data):
 
 async def set_new_category(category_name):
     async with async_session() as session:
-        session.add(Category(name=category_name))
+        try:
+            session.add(Category(**category_name))
+        except sqlalchemy.exc.IntegrityError as e:
+            return e
         await session.commit()
 
 

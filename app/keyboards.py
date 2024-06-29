@@ -1,14 +1,15 @@
-from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton, )
+from aiogram.types import (InlineKeyboardMarkup, InlineKeyboardButton,
+                           KeyboardButton, ReplyKeyboardMarkup)
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.database.requests import get_categories, get_items_by_category
 
-main_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Catalog", callback_data="catalog")],
-    [InlineKeyboardButton(text="Cart", callback_data="my_cart"),
-     InlineKeyboardButton(text="Contacts", callback_data="contacts")
-     ],
-])
+main_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text="Catalog", callback_data="catalog")],
+    [KeyboardButton(text="Cart", callback_data="my_cart"),
+     KeyboardButton(text="Contacts", callback_data="contacts")]],
+    resize_keyboard=True
+)
 
 to_main_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="My cart", callback_data="my_cart")],

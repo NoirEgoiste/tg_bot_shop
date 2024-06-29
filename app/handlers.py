@@ -12,26 +12,25 @@ router = Router()
 @router.message(CommandStart())
 @router.callback_query(F.data == "to_main")
 async def cmd_start(message: Message | CallbackQuery):
-    print(message.from_user.id, message.from_user.username)
     if isinstance(message, Message):
         await set_user(
             message.from_user.id, message.from_user.username
         )
         await message.answer(
-            "Welcome to internet shop!",
+            "Welcome to shop!",
             reply_markup=keyboards.main_keyboard
         )
     else:
         await message.answer("Back to main menu")
         await message.message.answer(
-            "Welcome to internet shop!",
+            "Welcome shop!",
             reply_markup=keyboards.to_main_keyboard
         )
 
 
-@router.callback_query(F.data == "catalog")
-async def catalog(callback: CallbackQuery):
-    await callback.message.edit_text(
+@router.message(F.data == "catalog")
+async def catalog(message: Message):
+    await message.edit_text(
         "Choose, category",
         reply_markup=await keyboards.categories_keyboard()
     )
