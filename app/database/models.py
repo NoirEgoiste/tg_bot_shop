@@ -21,7 +21,7 @@ class User(Base):
     tg_id = mapped_column(BigInteger)
     cart_relationship: Mapped['Cart'] = relationship(
         back_populates='user_relationship'
-    ) #Пользователь удаляется удаляется и корзина(Корзина живет определенное количество времени?)
+    )
 
 
 class Category(Base):
@@ -66,4 +66,3 @@ class Cart(Base):
 async def async_main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    

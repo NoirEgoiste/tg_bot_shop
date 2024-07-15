@@ -10,7 +10,7 @@ router = Router()
 
 
 @router.message(CommandStart())
-@router.callback_query(F.data == "to_main")
+@router.callback_query(F.data.lower() == "to_main")
 async def cmd_start(message: Message | CallbackQuery):
     if isinstance(message, Message):
         await set_user(
@@ -28,9 +28,10 @@ async def cmd_start(message: Message | CallbackQuery):
         )
 
 
-@router.message(F.data == "catalog")
-async def catalog(message: Message):
-    await message.edit_text(
+@router.callback_query(F.text == "catalog")
+async def catalog(callback: CallbackQuery):
+    print("Hey")
+    await callback.message.answer(
         "Choose, category",
         reply_markup=await keyboards.categories_keyboard()
     )

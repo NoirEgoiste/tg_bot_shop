@@ -4,16 +4,20 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from app.database.requests import get_categories, get_items_by_category
 
-main_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text="Catalog", callback_data="catalog")],
-    [KeyboardButton(text="Cart", callback_data="my_cart"),
-     KeyboardButton(text="Contacts", callback_data="contacts")]],
-    resize_keyboard=True
-)
+# main_keyboard = ReplyKeyboardMarkup(keyboard=[
+#     [KeyboardButton(text="Catalog", callback_data="catalog")],
+#     [KeyboardButton(text="Cart", callback_data="my_cart"),
+#      KeyboardButton(text="Contacts", callback_data="contacts")]],
+#     resize_keyboard=True
+# )
+main_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Catalog", callback_data="catalog")],
+    [InlineKeyboardButton(text="Cart", callback_data="my_cart"),
+     InlineKeyboardButton(text="Contacts", callback_data="contacts")]])
 
 to_main_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="My cart", callback_data="my_cart")],
-    [InlineKeyboardButton(text="Main catalog", callback_data="catalog")]])
+    [InlineKeyboardButton(text="Main catalog", callback_data="Catalog")]])
 
 
 async def cart_keyboard(order_id):
@@ -59,5 +63,5 @@ async def items_keyboard(category_id: int):
             text=item.name,
             callback_data=f"item_{item.id}")
         )
-    keyboard.add(InlineKeyboardButton(text="Back", callback_data="catalog"))
+    keyboard.add(InlineKeyboardButton(text="Back", callback_data="Catalog"))
     return keyboard.adjust(2).as_markup()
