@@ -1,7 +1,7 @@
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-ENGINE = "sqlite+aiosqlite:///db.sqlite3"
+ENGINE = os.getenv("ENGINE")
 ECHO = True
