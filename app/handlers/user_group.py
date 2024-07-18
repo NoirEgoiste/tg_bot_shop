@@ -1,10 +1,13 @@
 from string import punctuation
 
-from aiogram import F, Router
-from aiogram.filters import CommandStart, Command, or_f
+from aiogram import Router
+from aiogram.enums import ChatType
 from aiogram.types import Message
 
+from app.filters.chat_type_filter import ChatTypeFilter
+
 group = Router()
+group.message.filter(ChatTypeFilter([ChatType.GROUP]))
 
 restricted_words = {"кабан", "цирк", "выхухоль"}
 

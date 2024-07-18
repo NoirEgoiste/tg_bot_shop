@@ -1,8 +1,12 @@
 from aiogram import Router, F
+from aiogram.enums import ChatType
 from aiogram.filters import Command, or_f
 from aiogram.types import Message, CallbackQuery
 
+from app.filters.chat_type_filter import ChatTypeFilter
+
 user = Router()
+user.message.filter(ChatTypeFilter([ChatType.PRIVATE]))
 
 
 @user.message(or_f(Command("menu"), F.text.lower() == "меню"))
