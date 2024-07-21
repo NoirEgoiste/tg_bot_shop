@@ -1,115 +1,43 @@
 from aiogram import Router, F
+from aiogram.enums import ChatType
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command, Filter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-import app.keyboards as keyboards
-from app.database.requests import get_users, set_item, set_new_category
+from app.filters.chat_type_filter import ChatTypeFilter, IsAdmin
+from app.keyboards.keyboards_creater import get_keyboard
 
 admin = Router()
+admin.message.filter(ChatTypeFilter(ChatType.PRIVATE), IsAdmin())
+admin_btns = ["Добавить товар", "Изменить товар", "Удалить товар", "Посмотреть товар",]
+
+ADMIN_KB = get_keyboard(
+    *admin_btns,
+    placeholder="Выбирите действие",
+    sizes=(2, 1, 1)
+)
+
+@admin.message(Command("admin"))
+async def add_product(message: Message):
+    await message.answer("Выберите действие", reply_markup=await ADMIN_KB)
 
 
-class NewsLetter(StatesGroup):
-    message = State()
+@admin.message(F.text == "Добавить товар")
+async def change_product(message: Message):
+    await message.answer("ОК, вот список товаров")
 
 
-class AddItem(StatesGroup):
-    name = State()
-    category = State()
-    description = State()
-    photo = State()
-    price = State()
+@admin.message(F.text == "Изменить товар")
+async def change_product(message: Message):
+    await message.answer("ОК, вот список товаров")
 
 
-class AddCategory(StatesGroup):
-    name = State()
+@admin.message(F.text == "Удалить товар")
+async def delete_product(message: Message):
+    await message.answer("Выберите товар(ы) для удаления")
 
 
-class AdminProtect(Filter):
-    async def __call__(self, message: Message):
-        return message.from_user.id in [239721784]  # Tg admin id's
-
-
-@admin.message(AdminProtect(), Command("admin"))
-async def admin_panel(message: Message):
-    await message.answer(f"Commands: \n"
-                         f"/newsletter\n"
-                         f"/add_item\n"
-                         f"/add_category\n")
-
-
-@admin.message(AdminProtect(), Command("newsletter"))
-async def newsletter(message: Message, state: FSMContext):
-    await state.set_state(NewsLetter.message)
-    await message.answer("Send a message, for all users")
-
-
-@admin.message(AdminProtect(), NewsLetter.message)
-async def newsletter_message(message: Message, state: FSMContext):
-    await message.answer("Please wait... Mailing in progress")
-    for user in await get_users():
-        try:
-            await message.send_copy(chat_id=user.tg_id)
-        except Exception as e:
-            print(f"Not implemented {e}")
-    await message.answer("Mailing Ended")
-    await state.clear()
-
-
-@admin.message(AdminProtect(), Command("add_category"))
-async def add_category(message: Message, state: FSMContext):
-    await state.set_state(AddCategory.name)
-    await message.answer("Enter category to add")
-
-
-@admin.message(AdminProtect(), AddCategory.name)
-async def add_category_name(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await set_new_category(await state.get_data())
-    await message.answer("Category successfully added")
-    await state.clear()
-
-
-@admin.message(AdminProtect(), Command("add_item"))
-async def add_item(message: Message, state: FSMContext):
-    await state.set_state(AddItem.name)
-    await message.answer("Enter Item name")
-
-
-@admin.message(AdminProtect(), AddItem.name)
-async def add_item_name(message: Message, state: FSMContext):
-    await state.update_data(name=message.text)
-    await state.set_state(AddItem.category)
-    await message.answer("Select or Add Item category",
-                         reply_markup=await keyboards.categories_keyboard())
-
-
-@admin.callback_query(AdminProtect(), AddItem.category)
-async def add_item_category(callback: CallbackQuery, state: FSMContext):
-    await state.update_data(category=callback.data.split("_")[1])
-    await state.set_state(AddItem.description)
-    await callback.answer("")
-    await callback.message.answer("Enter Item description")
-
-
-@admin.message(AdminProtect(), AddItem.description)
-async def add_item_description(message: Message, state: FSMContext):
-    await state.update_data(description=message.text)
-    await state.set_state(AddItem.photo)
-    await message.answer("Upload Item photo")
-
-
-@admin.message(AdminProtect(), AddItem.photo, F.photo)
-async def add_item_photo(message: Message, state: FSMContext):
-    await state.update_data(photo=message.photo[-1].file_id)
-    await state.set_state(AddItem.price)
-    await message.answer("Enter Item price")
-
-
-@admin.message(AdminProtect(), AddItem.price)
-async def add_item_price(message: Message, state: FSMContext):
-    await state.update_data(price=message.text)
-    await set_item(await state.get_data())
-    await message.answer("Item successfully added")
-    await state.clear()
+@admin.message(F.text == "Посмотреть товар")
+async def starring_at_product(message: Message):
+    await message.answer("ОК, вот список товаров")
