@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.enums import ChatType
 from aiogram.types import Message, ReplyKeyboardRemove
-from aiogram.filters import Command, Filter
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
@@ -57,4 +57,24 @@ async def cancel_handler(message: Message) -> None:
 
 @admin.message(F.text)
 async def add_name(message: Message):
-    pass
+    await message.answer("Введите название товара")
+
+
+@admin.message(F.text)
+async def add_description(message: Message):
+    await message.answer("Введите описание товара")
+
+
+@admin.message(F.text)
+async def add_price(message: Message):
+    await message.answer("Введите стоимость товара")
+
+
+@admin.message(F.text)
+async def add_image(message: Message):
+    await message.answer("Загрузите изображение товара")
+
+
+@admin.message(F.text)
+async def add_image(message: Message):
+    await message.answer("Товар добавлен", reply_markup=ADMIN_KB)
