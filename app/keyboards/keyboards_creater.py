@@ -1,9 +1,9 @@
-from aiogram.types import KeyboardButton
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 async def get_keyboard(
-    *btns: str,
+    btns: list[str],
     placeholder: str = None,
     request_contact: int = None,
     request_location: int = None,
@@ -42,6 +42,4 @@ async def get_keyboard(
         else:
             keyboard.add(KeyboardButton(text=text))
     
-    return keyboard.adjust(*sizes).as_markup(
-        resize_keyboard=True, input_field_placeholder=placeholder
-    )
+    return keyboard
