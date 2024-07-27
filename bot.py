@@ -3,13 +3,13 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.types import BotCommandScopeAllPrivateChats
 
-
 from bot_commands_list import private
 from config import TOKEN
+from app.middlewares.db import DataBaseSession
 from app.handlers.user_handlers import user
 from app.handlers.admin_handlers import admin as admin
 from app.handlers.group_handlers import group
-from app.database.engine import create_db, drop_db
+from app.database.engine import create_db, drop_db, session_maker
 
 
 ALLOWED_UPDATES = ["message", "edit_message", "callback_query"]
@@ -19,6 +19,7 @@ bot.my_admins_list = [239721784]
 
 dp = Dispatcher()
 dp.include_routers(admin, user, group)
+
 
 async def on_startup(bot):
     run_param = False
@@ -30,9 +31,12 @@ async def on_startup(bot):
 async def on_shutdown(bot):
     print("Bot shutdown")
 
+
 async def main():
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
+    
+    dp.update.middleware(DataBaseSession(session_pool=session_maker))
     
     await create_db()
     await bot.delete_webhook(drop_pending_updates=True)
