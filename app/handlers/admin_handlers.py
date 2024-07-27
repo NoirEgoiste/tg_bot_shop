@@ -5,12 +5,17 @@ from aiogram.types import Message, ReplyKeyboardRemove, ReplyKeyboardMarkup, \
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.database.engine import session_maker
+from app.database.models import Product
 from app.filters.chat_type_filter import ChatTypeFilter, IsAdmin
 from app.keyboards.keyboards_creater import get_keyboard
+from app.middlewares.db import DataBaseSession
 
 admin = Router()
 admin.message.filter(ChatTypeFilter(ChatType.PRIVATE), IsAdmin())
+admin.message.middleware(DataBaseSession(session_pool=session_maker))
 
 admin_btns = ["Добавить товар", "Изменить товар", "Удалить товар",
               "Посмотреть товар", ]
@@ -138,10 +143,25 @@ async def add_price(message: Message, state: FSMContext):
 
 
 @admin.message(AddProduct.image, F.photo)
-async def add_image(message: Message, state: FSMContext):
+async def add_image(
+        message: Message,
+        state: FSMContext,
+        session: AsyncSession
+):
     await state.update_data(image=message.photo[-1].file_id)
     data = await state.get_data()
-    # await message.answer("Товар добавлен", reply_markup=BACK_KB)
+    session.add(Product(**data))
+    await session.commit()
+    await message.answer(
+        "Нажмите продолжить если введенная информация верна",
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="назад"),
+                 KeyboardButton(text="отмена")],
+                [KeyboardButton(text="продолжить")],
+            ],
+            resize_keyboard=True
+)
+    )
     await message.answer("Товар добавлен", reply_markup=ADMIN_KB)
-    await message.answer(str(data))
     await state.clear()
